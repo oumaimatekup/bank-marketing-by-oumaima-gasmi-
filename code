@@ -1,0 +1,470 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Apr 15 12:49:41 2022
+
+@author: gasmi
+"""
+import numpy as np 
+import sklearn
+import pickle
+from sklearn.preprocessing import LabelEncoder
+from sklearn import preprocessing
+from sklearn import model_selection
+from sklearn import metrics
+import pandas as pd
+import seaborn as sns 
+#import pylab as plb
+import matplotlib.pyplot as plt
+#########################
+###########################
+#############################
+
+df = pd.read_csv("C:/Users/gasmi/Downloads/bank_projet_oumaima_imed_ala",sep=',')
+df.head(3)
+df.describe()
+df.columns
+df.info()
+df.duplicated().sum()
+df.isnull().sum()
+df.isna().sum() 
+# For the convenience of following EDA, first map the response 'y' into {0, 1}
+"""mapping_yn = {'no': 0, 'yes': 1}
+df['y'] = df['y'].map(mapping_yn)
+df['y'].value_counts()"""
+
+df.replace(['basic.6y','basic.4y', 'basic.9y'], 'basic', inplace=True)
+df.education.value_counts()
+
+"""********************************"""
+
+df.info()
+df.describe()
+df['age'].value_counts()
+df['job'].value_counts()
+df['education'].value_counts()
+df['age'].unique()
+df['job'].unique()
+df.duplicated().sum()
+df.isna().sum()
+
+
+"""********************************************"""
+"""
+target = df['y']
+df= df.drop(['y'], axis=1)
+Label = np.array(target).reshape(-1,1)
+from sklearn.preprocessing import LabelEncoder
+X1=Label
+le = LabelEncoder()
+X1New = le.fit_transform(X1) 
+X1New = X1New.reshape(-1,1)
+
+Data1=np.concatenate((df,X1New),axis=1)
+data=pd.DataFrame(Data1)
+"""
+
+"""********************************"""
+"""********************************************"""
+"""Preparation data"""
+data=df
+data.info()
+vrt= data['y']
+
+from sklearn.preprocessing import LabelEncoder
+X1=data['job']
+le = LabelEncoder()
+X1New = le.fit_transform(X1) 
+job = X1New.reshape(-1,1)
+
+X2=data['marital']
+le = LabelEncoder()
+X2New = le.fit_transform(X2) 
+marital= X2New.reshape(-1,1)
+
+X3=data['education']
+le = LabelEncoder()
+X3New = le.fit_transform(X3) 
+education = X3New.reshape(-1,1)
+
+X4=data['default']
+le = LabelEncoder()
+X4New = le.fit_transform(X4) 
+default = X4New.reshape(-1,1)
+
+
+X5=data['housing']
+le = LabelEncoder()
+X5New = le.fit_transform(X5) 
+housing = X5New.reshape(-1,1)
+
+
+X6=data['loan']
+le = LabelEncoder()
+X6New = le.fit_transform(X6) 
+loan = X2New.reshape(-1,1)
+
+X7=data['contact']
+le = LabelEncoder()
+X7New = le.fit_transform(X7) 
+contact = X7New.reshape(-1,1)
+
+X8=data['month']
+le = LabelEncoder()
+X8New = le.fit_transform(X8) 
+month = X8New.reshape(-1,1)
+
+X9=data['day_of_week']
+le = LabelEncoder()
+X9New = le.fit_transform(X9) 
+day = X2New.reshape(-1,1)
+
+
+X10=data['poutcome']
+le= LabelEncoder()
+X10New = le.fit_transform(X10) 
+poutcome = X10New.reshape(-1,1)
+
+y=np.array(vrt).reshape(-1,1)
+age=np.array(data['age']).reshape(-1,1)
+duration=np.array(data['duration']).reshape(-1,1)
+campaign=np.array(data['campaign']).reshape(-1,1)
+pdays=np.array(data['pdays']).reshape(-1,1)
+previous=np.array(data['previous']).reshape(-1,1)
+emp=np.array(data['emp var rate']).reshape(-1,1)
+consPrice=np.array(data['cons price idx']).reshape(-1,1)
+consConf=np.array(data['cons conf idx']).reshape(-1,1)
+eur=np.array(data['euribor3m']).reshape(-1,1)
+nbrEmp=np.array(data['nr employed']).reshape(-1,1)
+
+
+
+data1=np.concatenate((age,job,marital,education,default,housing,loan,contact,month,day,duration,campaign,pdays,previous,poutcome,emp,consPrice,consConf,eur,nbrEmp,y),axis=1)
+#dataset2=data1.rename(columns={age,job,marital,education,default,housing,loan,contact,month,day,duration,campaign,pdays,previous,poutcome,emp,consPrice,consConf,eur,nbrEmp,y})
+data2=pd.DataFrame(data1, columns=['age','job','marital','education','default','housing','loan','contact','month','day','duration','campaign','pdays','previous','poutcome','emp','consPrice','consConf','eur','nbrEmp','deposit'])
+
+#####################################
+
+"""sns.catplot(x = 'y', kind = 'count', palette = 'pastel', edgecolor = '.6', data = df)
+sns.countplot(x='y', data=df)
+sns.countplot(y='job', data=df)
+sns.countplot(x='marital', data=df)
+sns.countplot(y='education', data=df)
+
+#########################
+le = preprocessing.LabelEncoder()
+df.job = le.fit_transform(df.job)
+df.marital = le.fit_transform(df.marital)
+df.education = le.fit_transform(df.education)
+df.housing = le.fit_transform(df.housing)
+df.loan = le.fit_transform(df.loan)
+df.poutcome = le.fit_transform(df.poutcome)
+df.head()
+df.shape
+
+#####################################ye7sseblk kol visualisation par rapport totale des y et leur indices 
+#ya3ni kol courbe w les données  ta3ou selon les indices et y 
+
+categorcial_variables = ['job', 'marital', 'education', 'default', 'loan', 'contact', 'month', 'day_of_week', 'poutcome','y']
+for col in categorcial_variables:
+    plt.figure(figsize=(15,10))
+    sns.barplot(df[col].value_counts().values, df[col].value_counts().index)
+    plt.title(col)
+    plt.tight_layout()
+    
+
+#####################################
+#hethom les visualisations 7ASB ELI 9ALOU YES  WELI 9ALOU O ,,,, TA3 LES COLONNES OR LES FEATURES LKOOL KOL WA7DA WA7ADHA 
+
+categorcial_variables = ['job', 'marital', 'education', 'default', 'loan', 'contact', 'month', 'day_of_week', 'poutcome','y']
+for col in categorcial_variables:
+    plt.figure(figsize=(10,4))
+    #Returns counts of unique values for each outcome for each feature.
+    pos_counts = df.loc[df.y.values == 1, col].value_counts() 
+    neg_counts = df.loc[df.y.values == 0, col].value_counts()
+    
+    all_counts = list(set(list(pos_counts.index) + list(neg_counts.index)))
+    #Counts of how often each outcome was recorded.
+    freq_pos = (df.y.values == 1).sum()
+    freq_neg = (df.y.values == 0).sum()
+    
+    pos_counts = pos_counts.to_dict()
+    neg_counts = neg_counts.to_dict()
+    
+    all_index = list(all_counts)
+    all_counts = [pos_counts.get(k, 0) / freq_pos - neg_counts.get(k, 0) / freq_neg for k in all_counts]
+
+    sns.barplot(all_counts, all_index)
+    plt.title(col)
+    plt.tight_layout()
+    
+    
+#########################
+###########################
+#############################
+###############################
+#################################
+###################################
+#####################################
+nume_inputs = ['age', 'balance', 'duration', 'day', 'campaign', 'pdays', 'previous']
+cate_inputs = ['job', 'marital', 'education', 'default', 'housing', 'loan', 'contact', 'month', 'poutcome']
+outputs = 'y'
+#There're some binary variables such as 'default', 'housing', 'loan'. We might want to transform it for better predicting
+#Although no NULL is detected, there are many 'unknown' values, which we should deal with when preprocessing
+#There are a large percentage of unknown previous outcomes, which is not surprising because many customers don't have previous contacts (previous=0)
+for col in cate_inputs:
+    print('Unique "{}":\n {}'.format(col, df[col].unique()))
+# Check if there are null values
+print("Any null value in the data: ", df.isnull().any().any())
+
+#JOB JOB JOB JOB JOB JOB JOB JOB JOB JOB JOB JOB JOB JOB 
+#############################
+print("The average 'y' for each job are all < 0.3")
+print("Retired clients and students are more likely to subscribe among all the jobs")
+df.groupby('job').mean()['y'].plot.bar(rot=45)
+#########################
+#MAITAL MARITAL MARITAL MARITAL MARITAL 
+print("Single clients are a little bit more likely to subscribe")
+print("Married clients have the lowest subscribing rate")
+df.groupby('marital').mean()['y'].plot.bar(rot=45)
+##EDUCATION EDUCATION EDUCATION EDUCATION EDUCATION 
+#########################
+df.groupby('education').mean()['y'].plot.bar(rot=45)
+
+### DEFAULT DEFAULT DEFAULT DEFAULT DEFAULT 
+#########################
+print("Clients who have credit in default are less likely to subscribe")
+df.groupby('default').mean()['y'].plot.bar(rot=45)
+
+# HOUSING HOUSING HOUSING HOUSING HOUSING HOUSING
+#########################
+print("Clients with housing loan are less likely to subscribe a term deposit")
+df.groupby('housing').mean()['y'].plot.bar(rot=45)
+#########################
+###LOAN LOAN LOAN LOAN LOAN LOAN 
+print("Clients with personal loan are less likely to subscribe")
+df.groupby('loan').mean()['y'].plot.bar(rot=45)
+#############################
+##### Contact CONTACT CONTACT CONTCT CONTACT 
+print("The cellular and telephone contact have similar subscribing probability, but the prob of unknown is significantly lower")
+df.groupby('contact').mean()['y'].plot.bar(rot=45)
+#############################
+##age AGE AGE AGE AGE AGE AGE AGE AGE AGE 
+print("Majority (that's say 97pp or more) is <= 60")
+print("Among those with age <= 60, the younger the clients are, the more likely that they are to subscribe")
+sns.histplot(df['age'], bins=len(df['age'].unique()), kde=True)
+df.groupby('age').mean()['y'].plot(xlim=(15,101))
+df.groupby('age').mean()['y'].plot(xlim=(15,101))
+#############################
+# DURATION DURATION DURATION DURATION 
+print("Client with longer last contact duration are more likely to subscribe")
+print("Turn duration into minutes for easier understanding")
+sns.histplot(df.duration / 60, bins=50, kde=True)
+#still many outliers 
+sns.boxplot(x=df.duration / 60)
+print("shown by the boxplot above, duration in min above 10~15 are regarded as outliers")
+print("then we further check those below 15")
+print("the below bar chart shows an increasing subscription probability of clients with longer contact duration")
+df_duration_ranged = df[df['duration'] /60 <= 15]
+df_duration_ranged.groupby(pd.cut(df_duration_ranged['duration'], bins=20)).mean()['y'].plot.bar(rot=45)
+############################# 
+#Campaign Campaign Campaign Campaign Campaign Campaign Campaign 
+print("Most clients only have 1 contact during this campaign")
+sns.histplot(df.campaign, bins=50, kde=True)
+print("As 'campaign' > 13 don't have enough samples, we just take those <= 13 for deep diving")
+print("During this campaign theres a trend that clients being contacted more are less and less likely to subscribe")
+# and those have campaign under or equal 13
+df[df['campaign'] <= 13].groupby('campaign').mean()['y'].plot.bar()
+############################# 
+# Pdays  Pdays   Pdays   Pdays   Pdays   Pdays 
+print("The majority of users did not have a last campaign")
+sns.histplot(df.pdays, bins=50, kde=True)
+sns.histplot(df[df.pdays > -1].pdays, bins=50, kde=True)
+############################# 
+#Previous Previous Previous Previous Previous
+print("Distribution of 'previous' is also extremly skewedpdays")
+print("For the previous <= 10, clients with more previous campaigns are more likely to subscribe")
+print("Only few clients have previous campaigns > 10 (less than 1pp of the sample")
+sns.histplot(df[df.previous > 0].previous, bins=50, kde=True)
+sns.histplot(df.loc[df.previous <= 20, 'previous'], 
+  bins=len(df.loc[df.previous <= 20, 'previous'].unique()), kde=True)
+df[df['previous'] <= 10].groupby('previous').mean()['y'].plot.bar()
+
+#############################
+#Month #Month #Month #Month #Month #Month# onth
+from calendar import month_abbr
+#print("A subtle seasonality is shown")
+#df['month'].value_counts().loc[list(map(lambda x: x.lower(), month_abbr))[1:]].plot.bar(rot=45)
+#df.groupby('month').mean().loc[list(map(lambda x: x.lower(), month_abbr))[1:], 'y'].plot.bar(rot=45)
+#############################
+#  Day  Day  Day  Day  Day Day Day Day
+sns.histplot(df.day_of_week , bins=len(df['day_of_week'].unique()), kde=True)
+df.groupby('day_of_week').mean()['y'].plot.bar() 
+#####################################
+#####################################
+#Processing binary variables Processing binary variables Processing binary variables Processing binary variables
+#{"yes": 1, "no": 0}
+mapping_yn = {'no': 0, 'yes': 1}
+col_binary = ['default', 'housing', 'loan']
+for col in col_binary:
+    df[col] = df[col].map(mapping_yn)
+#From string to numbers
+mapping_month = dict((month.lower(), number) for number, month in enumerate(month_abbr))
+df['month'] = df['month'].map(mapping_month)
+#The education is ordinal and can be encoded as integers
+edu_map = {'unknown':0, 'primary':1, 'secondary':2, 'tertiary':3}
+#df['education'] = df.education.map(edu_map).astype('int')
+df.groupby('education').count()['y'].sort_values(ascending=False)
+# One-hot encoding  One-hot encoding  One-hot encoding
+cols_dumm = ['job', 'marital', 'contact', 'poutcome']
+df = pd.get_dummies(df, columns=cols_dumm)
+# Remove the columns corresponding to unknown value
+cols_onehot_unknown = [col for col in df.columns if 'unknown' in col]
+df = df.drop(cols_onehot_unknown, axis=1)
+col_features = list(df.columns)
+col_features.remove('y')
+col_target = 'y'
+# Check current data set
+pd.set_option('display.max_columns', None)
+df.head(3)
+#########################
+#####################################
+# Train Test Split  Train Test Split  Train Test Split
+dela=["default","month day_of_week","duration","campaign","pdays","previous","emp.var.rate","cons.price.idx","cons.conf.idx",   ]
+df=df.drop(['y'], axis=1)""" ###
+ 
+
+
+
+"""Techniques to Handle Imbalanced Data For a Classification Problem"""
+
+from imblearn.over_sampling import SMOTE
+
+
+#oversample = SMOTE()
+#X, y = oversample.fit_resample(X, y)
+
+
+
+# Resampling the minority class. The strategy can be changed as required.
+sm = SMOTE(sampling_strategy='minority', random_state=42)
+# Fit the model to generate the data.
+
+oversampled_X, oversampled_Y = sm.fit_resample(data2.drop('deposit', axis=1),data2['deposit'])
+Data4 =pd.concat( [pd.DataFrame(oversampled_X) ,pd.DataFrame(oversampled_Y)], axis=1)
+print(Data4)
+Data4.info()
+Data4['deposit'].value_counts()
+
+#Data= data.drop(['job','marital','education','default','housing','loan','contact','month','day_of_week','poutcome','y'], axis=1)
+
+#data2=pd.DataFrame(data1, columns=['age','job','marital','education','default','housing','loan','contact','month','day','duration','campaign','pdays','previous','poutcome','emp','consPrice','consConf','eur','nbrEmp','deposit'])
+df=Data4
+y = df["deposit"]
+X = df.drop(['deposit'], axis=1)
+from sklearn.decomposition import PCA
+# raw data
+
+# split, random_state is used for repeatable results, you should remove it if you are running your own code.
+pca = PCA(n_components=0.9)
+x_pca = pca.fit_transform(X)
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(x_pca, y, test_size=0.3, random_state=1)
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
+#svc_sig = SVC(kernel='sigmoid', gamma=1.0)
+#svc_rbf = SVC(kernel='rfb', gamma=0.1 , coef0=0.1)
+svc_lineair = SVC(kernel='linear', C=1)
+dtc = DecisionTreeClassifier(max_depth=5)
+lrc = LogisticRegression(solver='liblinear', penalty='l1')
+rfc = RandomForestClassifier(n_estimators=50, random_state=42)
+xgb = XGBClassifier(n_estimators=50,random_state=42)
+
+clfs = {"svc_lineair":svc_lineair, 'DT': dtc, 'LR': lrc,'RF': rfc,'XGB':xgb}
+#clfs = {'svc_sig':svc_sig,"svc_rbf":svc_rbf,"svc_lineair":svc_lineair, 'DT': dtc, 'LR': lrc,'RF': rfc,'XGB':xgb}
+
+from sklearn.model_selection import cross_val_score
+from sklearn import metrics
+from sklearn.metrics import precision_score, recall_score, plot_confusion_matrix, classification_report, accuracy_score, f1_score
+
+from sklearn.metrics import roc_curve,auc
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+def train_classifier(clf,X_train,y_train,X_test,y_test):
+    clf.fit(X_train,y_train)
+    y_pred = clf.predict(X_test)
+    #train_accuracy = accuracy_score(X_train, y_train)
+    accuracy = accuracy_score(y_test,y_pred)
+    precision = precision_score(y_test, y_pred)
+    f1 = metrics.f1_score(y_test, y_pred)
+    recall = metrics.recall_score(y_test, y_pred)
+    return accuracy,precision,f1,recall
+    
+def fig_roc(clf,X_train, X_test, y_train, y_test):
+    clf.fit(X_train,y_train)
+    y_pred = clf.predict(X_test)
+    fp,tp,thresholds=roc_curve(y_test, y_pred,pos_label=1)
+    print(fp,tp)
+    AUC=auc(fp,tp)*100
+    print(AUC)
+    plt.plot(fp, tp, color='blue',label = 'AUC = %0.2f' % AUC)
+    t=str(clf)
+    plt.title('Receiver Operating Characteristic'+t)
+    #plt.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % AUC)
+    plt.legend(loc = 'lower right')
+    plt.plot([0, 1], [0, 1],'r--')
+    plt.xlim([0, 1])
+    plt.ylim([0, 1])
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
+    plt.show() 
+    
+"""def CM_df(clf,y_test):
+    clf.fit(X_train,y_train)
+    y_pred = clf.predict(X_test)
+    CM= confusion_matrix(y_test, y_pred)
+    print(CM)
+    sns.heatmap(CM, annot=True, cmap="BrBG_r" ,fmt='g')
+    plt.tight_layout()
+    plt.title('Confusion matrix ', y=1.1)
+    plt.ylabel('Actual label')
+    plt.xlabel('Predicted label')"""
+##################################################)
+#################################################
+accuracy_scores = []
+precision_scores = []
+f1_scores = []
+recall_scores = []
+for name,clf in clfs.items():
+    
+    current_accuracy, current_precision, current_f1_score, current_recall_score = train_classifier(clf, X_train,y_train,X_test,y_test)
+    #fig_roc(clf,X_train, X_test, y_train, y_test)
+    clf.fit(X_train,y_train)
+    y_pred = clf.predict(X_test)
+    CM= confusion_matrix(y_test, y_pred)
+    print(CM)
+    print("\nFor classifier ",name, ":")
+    print("  Test_Accuracy - ",current_accuracy)
+    print("  Precision - ", current_precision)
+    print("  F1 Score - ", current_f1_score)
+    print("  Recall - ",current_recall_score)
+    accuracy_scores.append(current_accuracy)
+    precision_scores.append(current_precision)
+    f1_scores.append(f1_score)
+    recall_scores.append(recall_score)
+#############################################
+
+#############################################
+
+performance_df = pd.DataFrame({'Algorithm':clfs.keys(),'Test_Accuracy':accuracy_scores,'Precision':precision_scores, 'Recall':recall_scores, 'F1_Score':f1_scores}).sort_values('Precision',ascending=False)
+performance_df1 = pd.melt(performance_df, id_vars = "Algorithm")
+cols = cols= ['cyan','#ff8975', 'mediumpurple','greenyellow'] 
+plto = sns.catplot(x = 'Algorithm', y='value', 
+               hue = 'variable',data=performance_df1, kind='bar',height=6, palette = cols, aspect=2.3)
+
+
+plto.set(ylim=(0,1.0))
+for axes in plt.axes.flat:
+    _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45, size=13)
